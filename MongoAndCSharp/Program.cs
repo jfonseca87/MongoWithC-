@@ -16,10 +16,18 @@
             CreateMongoManyWithBsonDocument();
             CreateMongoManyWithClass();
 
+            // READ
+            UseOfFind();
+            FilterWithBsonDocument();
+            FilterWithString();
+            FilterByIdWithBsonDocument();
+            FilterByIdWithString();
+
             Console.WriteLine("The program has ended, press any key");
             Console.ReadKey();
         }
 
+        #region Create
         static void CreateMongoWithBsonDocument()
         {
             var collection = new MongoDb<BsonDocument>().GetCollection("student");
@@ -163,7 +171,57 @@
 
             Console.WriteLine("The records has been successfully created (scenario 4)");
         }
+        #endregion
 
+        #region Read
+        static void UseOfFind()
+        {
+            var collection = new MongoDb<BsonDocument>().GetCollection("student");
+
+            collection.Find(FilterDefinition<BsonDocument>.Empty).ForEachAsync(doc => Console.WriteLine(doc));
+
+        }
+
+        static void FilterWithBsonDocument()
+        {
+            var collection = new MongoDb<BsonDocument>().GetCollection("student");
+
+            var filter = new BsonDocument("Name", "Keanu Reeves");
+
+            collection.Find(filter).ForEachAsync(doc => Console.WriteLine(doc));
+        }
+
+        static void FilterWithString()
+        {
+            var collection = new MongoDb<BsonDocument>().GetCollection("student");
+
+            var filter = "{Name: 'Keanu Reeves'}";
+
+            collection.Find(filter).ForEachAsync(doc => Console.WriteLine(doc));
+        }
+
+        static void FilterByIdWithBsonDocument()
+        {
+            var collection = new MongoDb<BsonDocument>().GetCollection("student");
+
+            var filter = new BsonDocument("_id", new ObjectId("5ea37c1edc6da61880bff131"));
+
+            var doc = collection.Find(filter).FirstOrDefault();
+
+            Console.WriteLine(doc);
+        }
+
+        static void FilterByIdWithString()
+        {
+            var collection = new MongoDb<BsonDocument>().GetCollection("student");
+
+            var filter = "{_id: ObjectId('5ea37c1edc6da61880bff131')}";
+
+            var doc = collection.Find(filter).FirstOrDefault();
+
+            Console.WriteLine(doc);
+        }
+        #endregion
 
     }
 
