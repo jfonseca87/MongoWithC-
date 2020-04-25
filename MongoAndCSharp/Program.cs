@@ -22,6 +22,16 @@
             FilterWithString();
             FilterByIdWithBsonDocument();
             FilterByIdWithString();
+            FilterUsinEQWithBsonDocument();
+            FilterUsinEQWithString();
+            FilterUsinEQWithFilterDifinitionBuilder();
+            FilterUsinEQWithLambdaExpression();
+
+            // UPDATE
+            UpdateWithBsonDocument();
+
+            // DELETE
+            DeleteWithBsonDocument();
 
             Console.WriteLine("The program has ended, press any key");
             Console.ReadKey();
@@ -220,6 +230,73 @@
             var doc = collection.Find(filter).FirstOrDefault();
 
             Console.WriteLine(doc);
+        }
+
+        static void FilterUsinEQWithBsonDocument()
+        {
+            var collection = new MongoDb<BsonDocument>().GetCollection("student");
+
+            var filter = new BsonDocument("undergrad", new BsonDocument("$eq", false));
+
+            collection.Find(filter).ForEachAsync(doc => Console.WriteLine(doc));
+        }
+
+        static void FilterUsinEQWithString()
+        {
+            var collection = new MongoDb<BsonDocument>().GetCollection("student");
+
+            var filter = "{undergrad: {'$eq': false}}";
+
+            collection.Find(filter).ForEachAsync(doc => Console.WriteLine(doc));
+        }
+
+        static void FilterUsinEQWithFilterDifinitionBuilder()
+        {
+            var collection = new MongoDb<BsonDocument>().GetCollection("student");
+
+            var filter = new FilterDefinitionBuilder<BsonDocument>().Eq("undergrad", false);
+
+            collection.Find(filter).ForEachAsync(doc => Console.WriteLine(doc));
+        }
+
+        static void FilterUsinEQWithLambdaExpression()
+        {
+            var collection = new MongoDb<Student>().GetCollection("student");
+
+            collection.Find(x => x.Undergrad == false).ForEachAsync(doc => Console.WriteLine($"{doc.Id} - {doc.Name}"));
+        }
+        #endregion
+
+        #region Update
+        static void UpdateWithBsonDocument()
+        {
+            var collection = new MongoDb<BsonDocument>().GetCollection("student");
+
+            var filter = new BsonDocument("_id", new ObjectId("5ea24b49dc6da638a88216d7"));
+            var updateValues = new BsonDocument( new List<BsonElement>
+            {
+                new BsonElement("name", "Aurora Boreal"),
+                new BsonElement("undergrad", true),
+                new BsonElement("units", 10),
+                new BsonElement("classes", new BsonArray { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", })
+            });
+
+            collection.ReplaceOne(filter, updateValues);
+
+            Console.WriteLine("The record has been succcessfully updated");
+        }
+        #endregion
+
+        #region Delete
+        static void DeleteWithBsonDocument()
+        {
+            var collection = new MongoDb<BsonDocument>().GetCollection("student");
+
+            var filter = new BsonDocument("_id", new ObjectId("5ea24b49dc6da638a88216d7"));
+
+            collection.DeleteOne(filter);
+
+            Console.WriteLine("The record has been succcessfully deleted");
         }
         #endregion
 
